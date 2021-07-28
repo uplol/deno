@@ -34,7 +34,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::ffi::c_void;
-use std::mem::forget;
 use std::option::Option;
 use std::pin::Pin;
 use std::rc::Rc;
@@ -163,8 +162,7 @@ impl Drop for JsRuntime {
       // a `struct OwnedIsolate` which is not actually owned, hence the need
       // here to leak the `OwnedIsolate` in order to avoid a double free and
       // the segfault that it causes.
-      let v8_isolate = self.v8_isolate.take().unwrap();
-      forget(v8_isolate);
+      self.v8_isolate.take();
 
       // TODO(ry) V8 has a strange assert which prevents a SnapshotCreator from
       // being deallocated if it hasn't created a snapshot yet.
